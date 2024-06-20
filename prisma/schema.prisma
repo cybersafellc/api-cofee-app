@@ -1,0 +1,47 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model admin {
+  id String @id
+  username String
+  password String
+}
+
+model users {
+  id String @id
+  username String
+  password String
+  phone String
+  first_name String
+  last_name String
+}
+
+model products {
+  id String @id
+  name String
+  price Int
+  img String
+  stocks Boolean
+  description String
+}
+
+model orders {
+  id String @id
+  user_id String
+  product_id String
+  total Int
+  pending_payment Boolean
+  processing Boolean
+  done Boolean
+  cancel Boolean
+  date DateTime
+  token_pay String
+  payment_link String
+}

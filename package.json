@@ -1,0 +1,43 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "main": "src/main.js",
+  "type": "module",
+  "scripts": {
+    "test": "jest",
+    "dev": "nodemon src/main.js",
+    "build": "prisma generate",
+    "start": "node src/main.js"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.[t|j]sx?$": "babel-jest"
+    }
+  },
+  "keywords": [],
+  "author": "rusnanda purnama",
+  "license": "ISC",
+  "description": "cofee app",
+  "devDependencies": {
+    "@babel/preset-env": "^7.24.7",
+    "@types/jest": "^29.5.12",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0",
+    "prisma": "^5.15.1",
+    "supertest": "^7.0.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.15.1",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "winston": "^3.13.0",
+    "winston-daily-rotate-file": "^5.0.0"
+  }
+}
