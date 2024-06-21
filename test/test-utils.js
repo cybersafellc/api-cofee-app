@@ -48,7 +48,7 @@ export const createProductTest = async () => {
     data: {
       id: "testing",
       name: "testing",
-      price: 0,
+      price: 10000,
       img: "testing.png",
       description: "testing",
       stocks: true,
@@ -61,6 +61,15 @@ export const deleteProductTest = async () => {
   await database.products.deleteMany({
     where: {
       name: "testing",
+    },
+  });
+  return;
+};
+
+export const deleteTestOrder = async () => {
+  await database.orders.deleteMany({
+    where: {
+      product_id: "testing",
     },
   });
   return;

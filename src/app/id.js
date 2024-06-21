@@ -9,7 +9,7 @@ class GenerateId {
   }
 
   async ohter_id() {
-    const number = crypto.randomInt(100, 999999999999);
+    const number = crypto.randomInt(100, 99999);
     const id = crypto.randomUUID();
     return `${number}${id}`;
   }
