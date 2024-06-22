@@ -19,4 +19,24 @@ const getById = Joi.object({
   user_id: Joi.string().required(),
 });
 
-export default { create, cancel, getAll, getById };
+const adminCancel = Joi.object({
+  id: Joi.string().required(),
+});
+
+const done = Joi.object({
+  id: Joi.string().required(),
+});
+
+const adminGetById = Joi.object({
+  id: Joi.string().required(),
+});
+
+export default {
+  create,
+  cancel,
+  getAll,
+  getById,
+  adminCancel,
+  done,
+  adminGetById,
+};

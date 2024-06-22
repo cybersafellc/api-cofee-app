@@ -74,3 +74,16 @@ export const deleteTestOrder = async () => {
   });
   return;
 };
+
+export const orderProcessingStatus = async () => {
+  await database.orders.updateMany({
+    data: {
+      processing: true,
+      pending_payment: false,
+    },
+    where: {
+      product_id: "testing",
+    },
+  });
+  return;
+};

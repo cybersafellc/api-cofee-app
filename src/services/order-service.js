@@ -6,7 +6,7 @@ import { ResponseError } from "../error/response-error.js";
 import orderValidation from "../validations/order-validation.js";
 import validation from "../validations/validation.js";
 import midtransClient from "midtrans-client";
-let snap = new midtransClient.Snap({
+const snap = new midtransClient.Snap({
   isProduction: false,
   serverKey: process.env.SERVER_KEY_MIDTRANS,
   clientKey: process.env.CLIENT_KEY_MIDTRANS,
@@ -173,7 +173,19 @@ const getAll = async (request) => {
   const orders = await database.orders.findMany({
     where: result,
   });
-  return new Response(200, "successfully response", orders, null, false);
+  const ordersRemap = await Promise.all(
+    orders.map(async (order) => {
+      const product = await database.products.findFirst({
+        where: {
+          id: order.product_id,
+        },
+      });
+      order.product_id = undefined;
+      order.product_details = product;
+      return order;
+    })
+  );
+  return new Response(200, "successfully response", ordersRemap, null, false);
 };
 
 const getById = async (request) => {
@@ -182,7 +194,226 @@ const getById = async (request) => {
     where: result,
   });
   if (!order) throw new ResponseError(400, "order does not exist");
+  const product = await database.products.findFirst({
+    where: {
+      id: order.product_id,
+    },
+  });
+  order.product_id = undefined;
+  order.product_details = product;
   return new Response(200, "successfully get", order, null, false);
 };
 
-export default { create, afterPayment, cancel, getAll, getById };
+const adminCancel = async (request) => {
+  const result = await validation(orderValidation.adminCancel, request);
+  result.done = false;
+  result.cancel = false;
+  const order = await database.orders.findFirst({
+    where: result,
+  });
+
+  if (!order) throw new ResponseError(400, "order does not exist");
+
+  if (order.processing) {
+    const reffundProcess = await fetch(
+      `${process.env.API_STATUS_ORDER}/v2/${order.id}/refund`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Basic ${process.env.APP_SERVER_KEY_ENCODE}`,
+        },
+        body: JSON.stringify({
+          refund_key: order.id,
+          amount: order.total,
+          reason: `reffund cofee_app`,
+        }),
+      }
+    );
+    const response = await reffundProcess.json();
+    if (response.status_code != 200) {
+      throw new ResponseError(
+        400,
+        "can't reffunded : " + response.status_message
+      );
+    }
+    return new Response(
+      200,
+      "successfully cancel and reffunded",
+      response,
+      null,
+      false
+    );
+  }
+
+  const canceled = await fetch(
+    `${process.env.API_STATUS_ORDER}/v2/${result.id}/cancel`,
+    {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Basic ${process.env.APP_SERVER_KEY_ENCODE}`,
+      },
+    }
+  );
+  const response = await canceled.json();
+  if (response.status_code != 200) {
+    throw new ResponseError(
+      400,
+      "the user hasn't select payment methode, wait the user canceled or select payment methode"
+    );
+  }
+  return new Response(200, "successfully canceled", response, null, false);
+};
+
+const done = async (request) => {
+  const result = await validation(orderValidation.done, request);
+  result.processing = true;
+  result.done = false;
+  const count = await database.orders.count({
+    where: result,
+  });
+  if (!count)
+    throw new ResponseError(400, "order on processing does not exist");
+  const markADone = await database.orders.update({
+    data: {
+      processing: false,
+      done: true,
+    },
+    where: {
+      id: result.id,
+    },
+  });
+
+  return new Response(200, "successfully mark a done", markADone, null, false);
+};
+
+const adminGetAll = async () => {
+  const orders = await database.orders.findMany();
+  const remapOrders = await Promise.all(
+    orders.map(async (order) => {
+      order.product_details = await database.products.findFirst({
+        where: {
+          id: order.product_id,
+        },
+      });
+      order.product_id = undefined;
+      return order;
+    })
+  );
+  return new Response(200, "successfully get orders", remapOrders, null, false);
+};
+
+const adminGetById = async (request) => {
+  const result = await validation(orderValidation.adminGetById, request);
+  const order = await database.orders.findFirst({
+    where: {
+      id: result.id,
+    },
+  });
+  if (!order) throw new ResponseError(400, "order does not exist");
+  order.product_details = await database.products.findFirst({
+    where: {
+      id: order.product_id,
+    },
+  });
+  order.product_id = undefined;
+  return new Response(200, "successfully get order", order, null, false);
+};
+
+const adminGetDone = async () => {
+  const orders = await database.orders.findMany({
+    where: {
+      done: true,
+    },
+  });
+  const newOrders = await Promise.all(
+    orders.map(async (order) => {
+      order.product_details = await database.products.findFirst({
+        where: {
+          id: order.product_id,
+        },
+      });
+      order.product_id = undefined;
+      return order;
+    })
+  );
+  return new Response(200, "successfully responses", newOrders, null, false);
+};
+
+const adminGetPending = async () => {
+  const orders = await database.orders.findMany({
+    where: {
+      pending_payment: true,
+    },
+  });
+  const newOrders = await Promise.all(
+    orders.map(async (order) => {
+      order.product_details = await database.products.findFirst({
+        where: {
+          id: order.product_id,
+        },
+      });
+      order.product_id = undefined;
+      return order;
+    })
+  );
+  return new Response(200, "successfully responses", newOrders, null, false);
+};
+
+const adminGetProcessing = async () => {
+  const orders = await database.orders.findMany({
+    where: {
+      processing: true,
+    },
+  });
+  const newOrders = await Promise.all(
+    orders.map(async (order) => {
+      order.product_details = await database.products.findFirst({
+        where: {
+          id: order.product_id,
+        },
+      });
+      order.product_id = undefined;
+      return order;
+    })
+  );
+  return new Response(200, "successfully responses", newOrders, null, false);
+};
+
+const adminGetCancel = async () => {
+  const orders = await database.orders.findMany({
+    where: {
+      cancel: true,
+    },
+  });
+  const newOrders = await Promise.all(
+    orders.map(async (order) => {
+      order.product_details = await database.products.findFirst({
+        where: {
+          id: order.product_id,
+        },
+      });
+      order.product_id = undefined;
+      return order;
+    })
+  );
+  return new Response(200, "successfully responses", newOrders, null, false);
+};
+
+export default {
+  adminGetCancel,
+  adminGetProcessing,
+  adminGetPending,
+  create,
+  afterPayment,
+  cancel,
+  getAll,
+  getById,
+  adminCancel,
+  done,
+  adminGetAll,
+  adminGetById,
+  adminGetDone,
+};
