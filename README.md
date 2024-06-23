@@ -9,8 +9,9 @@ This API application has 2 roles, namely ADMIN and USER, you can implement 2 sep
 Here's the documentation
 
 - URL: soon...
-- User : [USER ROLE API DOCS](https://github.com/cybersafellc/api-cofee-app/docs/user.md)
-- Admin : [ADMIN ROLE API DOCS](https://github.com/cybersafellc/api-cofee-app/docs/admin.md)
+- User : [USER ROLE API DOCS](https://github.com/cybersafellc/api-cofee-app/blob/main/docs/user.md)
+- Admin : [ADMIN ROLE API DOCS](https://github.com/cybersafellc/api-cofee-app/blob/main/docs/admin.md)
+- Public : [ADMIN ROLE API DOCS](https://github.com/cybersafellc/api-cofee-app/blob/main/docs/public.md)
 
 If you have any questions please contact my email
 
