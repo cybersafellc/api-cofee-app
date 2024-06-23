@@ -6,7 +6,7 @@ import productController from "../controllers/product-controller.js";
 import orderController from "../controllers/order-controller.js";
 
 const router = express.Router();
-router.post("/admin", adminController.register);
+// router.post("/admin", adminController.register);
 router.post("/admin/login", adminController.login);
 router.get(
   "/admin/verify-token",
