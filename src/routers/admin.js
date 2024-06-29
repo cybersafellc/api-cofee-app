@@ -4,6 +4,7 @@ import authMiddleware from "../middlewares/auth-middleware.js";
 import { multers } from "../middlewares/multer-middleware.js";
 import productController from "../controllers/product-controller.js";
 import orderController from "../controllers/order-controller.js";
+import soldReportController from "../controllers/sold-report-controller.js";
 
 const router = express.Router();
 // router.post("/admin", adminController.register);
@@ -78,5 +79,20 @@ router.get(
   "/admin/orders/cancel",
   authMiddleware.adminAccessToken,
   orderController.adminGetCancel
+);
+router.get(
+  "/sold-report/total-order",
+  authMiddleware.adminAccessToken,
+  soldReportController.getTotalOrder
+);
+router.get(
+  "/sold-report/total-profit",
+  authMiddleware.adminAccessToken,
+  soldReportController.getTotalProfit
+);
+router.get(
+  "/sold-report",
+  authMiddleware.adminAccessToken,
+  soldReportController.get
 );
 export default router;

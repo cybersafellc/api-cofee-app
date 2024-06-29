@@ -2,6 +2,7 @@ import { database } from "../app/database.js";
 import { generate } from "../app/id.js";
 import { logger } from "../app/logging.js";
 import { Response } from "../app/response.js";
+import sendNotification from "../app/send-notification.js";
 import { ResponseError } from "../error/response-error.js";
 import orderValidation from "../validations/order-validation.js";
 import validation from "../validations/validation.js";
@@ -66,6 +67,18 @@ const create = async (request) => {
       id: true,
       payment_link: true,
       token_pay: true,
+    },
+  });
+
+  await database.sold_report.create({
+    data: {
+      id: await generate.ohter_id(),
+      order_id: createOrder.id,
+      date: result.date,
+      total_amount: result.total,
+    },
+    select: {
+      id: true,
     },
   });
 
@@ -271,10 +284,10 @@ const done = async (request) => {
   const result = await validation(orderValidation.done, request);
   result.processing = true;
   result.done = false;
-  const count = await database.orders.count({
+  const orderInfo = await database.orders.findFirst({
     where: result,
   });
-  if (!count)
+  if (!orderInfo)
     throw new ResponseError(400, "order on processing does not exist");
   const markADone = await database.orders.update({
     data: {
@@ -285,7 +298,19 @@ const done = async (request) => {
       id: result.id,
     },
   });
-
+  const user = await database.users.findFirst({
+    where: {
+      id: orderInfo.user_id,
+    },
+    select: {
+      phone: true,
+      first_name: true,
+    },
+  });
+  await sendNotification(
+    `Hello ${user.first_name},%0AOrderan kamu sudah selesai nih %0AID: ${orderInfo.id}, %0ATotal: Rp.${orderInfo.total}`,
+    user.phone
+  );
   return new Response(200, "successfully mark a done", markADone, null, false);
 };
 

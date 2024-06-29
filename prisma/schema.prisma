@@ -45,3 +45,10 @@ model orders {
   token_pay String
   payment_link String
 }
+
+model sold_report {
+  id String @id
+  order_id String
+  date DateTime
+  total_amount Int
+}

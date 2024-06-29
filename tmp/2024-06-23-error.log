@@ -1,6 +1,0 @@
-{"level":"error","message":"Unexpected end of JSON input","timestamp":"2024-06-23T04:33:17.184Z"}
-{"level":"error","message":"Unexpected end of JSON input","timestamp":"2024-06-23T04:33:18.423Z"}
-{"level":"error","message":"Cannot read properties of null (reading 'first_name')","timestamp":"2024-06-23T07:30:20.014Z"}
-{"level":"error","message":"Cannot read properties of null (reading 'first_name')","timestamp":"2024-06-23T07:30:31.852Z"}
-{"level":"error","message":"Cannot read properties of null (reading 'first_name')","timestamp":"2024-06-23T07:31:33.346Z"}
-{"level":"error","message":"Cannot read properties of null (reading 'first_name')","timestamp":"2024-06-23T07:32:22.532Z"}

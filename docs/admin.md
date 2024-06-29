@@ -144,3 +144,41 @@ Responses Body Error
   "error": true
 }
 ```
+
+## Upload Images
+
+Endpoint : POST /products/images
+
+Headers :
+
+- Authorization : Bearer access_token
+
+Request Body
+
+- form-data (key: images)
+
+Responses Body Success :
+
+```json
+{
+  "status": 200,
+  "message": "successfully upload image",
+  "data": {
+    "filename": "https://api-cofee-app.rpnanda.com/products/images/9990999a35c5f-d3af-40f8-ac76-77a5cce83a9e.jpg"
+  },
+  "refrence": null,
+  "error": false
+}
+```
+
+Responses Body Error :
+
+```json
+{
+  "status": 500,
+  "message": "Unexpected field",
+  "data": null,
+  "refrence": null,
+  "error": true
+}
+```
