@@ -144,6 +144,14 @@ const afterPayment = async (request) => {
           id: responses.order_id,
         },
       });
+      await database.sold_report.updateMany({
+        data: {
+          total_amount: 0,
+        },
+        where: {
+          order_id: request.order_id,
+        },
+      });
     }
   }
   return;
